@@ -32,28 +32,52 @@ get_flitch_saw_points <- function(r, flitch_thick) {
   #2: max puutavaran hinta
   #3. max puutavaran dynaaminen hinta
 #Annettuna:
-  #Lankun leveys; 
-  #eri puutavaroiden leveydet (int);
-  #edellisten arvot (huom arvo riippuu tavoitteesta)
+  #Lankun leveys (kokonaisluku); 
+  #eri puutavaroiden leveydet (kokonaislukuvektori);
+  #edellisten arvot (kokonaislukuvektori);
 #Palauttaa:
   #leikattujen tavaroiden leveydet
 cut_flitch <- function(flitch_width, tmbr_widths, 
                        tmbr_values) {
-  # function unboundedKnapsack(weights, values, capacity):
-  #   n = length(weights)
-  #   dp = array of size (capacity + 1) initialized to 0
-  #   
-  #   for w from 1 to capacity:
-  #     for i from 0 to n - 1:
-  #     if weights[i] <= w:
-  #       dp[w] = max(dp[w], dp[w - weights[i]] + values[i])
-  #   
-  #   return dp[capacity]
+  m <- length(tmbr_widths) #number of items
   
-  #This is bottom-up dynamic programming approach
-  n <- length(tmbr_widths)
+  #Initializing
+  opt_val <- matrix(NA, nrow = m, ncol = flitch_width + 1) #F(m, y), optimum tmbr_values
+  index_info <- numeric(flitch_width) #from 1 to tmbr_widths[1]-1 elements are zero
+  index_info[tmbr_widths[1]:flitch_width] <- 1 #from tmbr_widths[1] to flitch_width elements are 1
   
-  dp <- numeric(flitch_width + 1)
+  for (y in 0:flitch_width) {
+    opt_val[1, y+1] <- tmbr_values[1]*floor(y/tmbr_widths[1])
+  }
+  
+  #Main loops
+  for (k in 2:m) {
+    
+    for (y1 in 0:(tmbr_widths[k])) {
+      opt_val[k, y1+1] <- opt_val[k-1,y1+1]
+    }
+    
+    for (y2 in (tmbr_widths[k]+1):(flitch_width+1)) {
+      if(opt_val[k-1, y2] < opt_val[k, y2-tmbr_widths[k]] + tmbr_values[k]) {
+        opt_val[k,y2] <- opt_val[k, y2-tmbr_widths[k]] + tmbr_values[k]
+        index_info[y2] <- k
+      } else {
+        opt_val[k,y2] <- opt_val[k-1,y2]
+      }
+    }
+  }
+  
+  #obtaining optimal solution
+  x_opt <- numeric(m)
+  y_opt <- flitch_width+1
+  
+  while(index_info[y_opt] > 0) {
+    idx <- index_info[y_opt]
+    x_opt[idx] <- x_opt[idx] + 1
+    y_opt <- y_opt - tmbr_widths[idx]
+  }
+  
+  return(x_opt)
   
 }
 

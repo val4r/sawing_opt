@@ -1,35 +1,51 @@
 unboundedKnapsack <- function(weights, values, capacity) {
-  n <- length(weights)
-  dp <- numeric(capacity + 1)
-  selectedItems <- numeric(capacity + 1)
+  m <- length(weights) #number of items
   
-  for (w in 1:capacity) {
-    for (i in 1:n) {
-      if (weights[i] <= w) {
-        if (dp[w - weights[i]] + values[i] > dp[w]) {
-          dp[w] <- dp[w - weights[i]] + values[i]
-          selectedItems[w] <- i
-        }
+  #Initializing
+  opt_val <- matrix(NA, nrow = m, ncol = capacity + 1) #F(m, y), optimum values
+  index_info <- numeric(capacity) #from 1 to weights[1]-1 elements are zero
+  index_info[weights[1]:capacity] <- 1 #from weights[1] to capacity elements are 1
+  
+  for (y in 0:capacity) {
+    opt_val[1, y+1] <- values[1]*floor(y/weights[1])
+  }
+  
+  #Main loops
+  for (k in 2:m) {
+    
+    for (y1 in 0:(weights[k])) {
+      opt_val[k, y1+1] <- opt_val[k-1,y1+1]
+    }
+    
+    for (y2 in (weights[k]+1):(capacity+1)) {
+      if(opt_val[k-1, y2] < opt_val[k, y2-weights[k]] + values[k]) {
+        opt_val[k,y2] <- opt_val[k, y2-weights[k]] + values[k]
+        index_info[y2] <- k
+      } else {
+        opt_val[k,y2] <- opt_val[k-1,y2]
       }
     }
   }
   
-  # Reconstruct the selected items
-  selectedItemsList <- integer()
-  w <- capacity
-  while (w > 0 & selectedItems[w] > 0) {
-    selectedItemsList <- c(selectedItemsList, selectedItems[w])
-    w <- w - weights[selectedItems[w]]
+  #obtaining optimal solution
+  x_opt <- numeric(m)
+  y_opt <- capacity+1
+  
+  while(index_info[y_opt] > 0) {
+    idx <- index_info[y_opt]
+    x_opt[idx] <- x_opt[idx] + 1
+    y_opt <- y_opt - weights[idx]
   }
   
-  result <- list(maxValue = dp[capacity], selectedItems = selectedItemsList)
-  return(result)
+  return(x_opt)
 }
 
+
+
 # Example usage
-weights <- c(2, 1, 3, 2)
-values <- c(12, 10, 20, 15)
-capacity <- 5
+weights <- c(4, 7, 9, 5)
+values <- c(5, 10, 12, 6)
+capacity <- 15
 
 result <- unboundedKnapsack(weights, values, capacity)
 cat("Maximum Value:", result$maxValue, "\n")
