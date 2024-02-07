@@ -24,6 +24,7 @@
 # For each quality class (grade)
 # Generate new cost coefficients based on updated
 # orderbook
+#Pseudokoodi Todoroki & Rönnqvist
 
 source("functions.R")
 timber_thickness <- 5 #puutavaran paksuus. Nyt käsitellään vain yhtä paksuutta

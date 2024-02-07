@@ -26,8 +26,8 @@ get_flitch_saw_points <- function(r, flitch_thick) {
   return (list_of_saw_points)
 }
 
-#funktio joka palauttaa läpisahatun lankun optimaalisen sahauksen annetulla tavoitefunktiolla
-#tavoitefunktiot: 
+#funktio joka palauttaa läpisahatun lankun optimaalisen sahauksen annetulla arvostuksella
+#arvostukset: 
   #1: max puutavaran läpileikkaus pinta-ala, i.e tässä hinta = leveys, 
   #2: max puutavaran hinta
   #3. max puutavaran dynaaminen hinta
@@ -109,15 +109,14 @@ create_dynamic_tmbr_prices <- function(orig_price, demand, prod) {
 
 #funktio joka muodostaa plotin joka visualisoi tukin leikkauksen
 #Argumentit:
-#tukin säde (numeric); läpisahausetäisyydet keskipisteestä (list of numerics)
-
+  #tukin säde (numeric); läpisahausetäisyydet keskipisteestä (list of numerics)
 visualize_log_cut <- function(log_diam, saw_points) {
   #geom_rect + geom_point
 }
 
 #funktio joka muodostaa plotin joka visualisoi tuppeensahatun lankun leikkauksen
 #Argumentit:
-#lankun pitkä sivu (numeric); lankun lyhyt sivu (numeric), sahauspisteet (list of numerics)
+  #lankun pitkä sivu (numeric); lankun lyhyt sivu (numeric), sahauspisteet (list of numerics)
 visualize_flitch_cut <- function(long_side, short_side, saw_points) {
   #geom_rect + geom_point
 }
