@@ -90,11 +90,11 @@ get_flitch_width <- function(r, a, b) {
   assert_that(a < b)
   assert_that(2*r > a && 2*r > b)
   if(b <= 0) {
-    return (2*sqrt(r^2-abs(a)^2))
+    return (floor(2*sqrt(r^2-abs(a)^2)))
   } else if(a < 0 && b > 0) {
-    return (min(2*sqrt(r^2-abs(a)^2), 2*sqrt(r^2-(b)^2)))
+    return (floor(min(2*sqrt(r^2-abs(a)^2), 2*sqrt(r^2-(b)^2))))
   } else if(a >= 0){
-    return (2*sqrt(r^2-(b)^2))
+    return (floor(2*sqrt(r^2-(b)^2)))
   }
 }
 
