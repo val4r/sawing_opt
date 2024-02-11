@@ -3,7 +3,6 @@ library("assertthat")
 #tarpeelliset funktiot
 
 
-
 #Funktio joka palauttaa tukin sahausetäisyydet tukin keskipisteestä
 #Annettuna:
   #Tukin säde
@@ -41,6 +40,8 @@ cut_flitch <- function(flitch_width, tmbr_widths,
                        tmbr_values) {
   m <- length(tmbr_widths) #number of items
   
+  assert_that(flitch_width >= max(tmbr_widths)) #leveimmän kappaleen täytyy olla kapeampi kuin annetun lankun
+  
   #Initializing
   opt_val <- matrix(NA, nrow = m, ncol = flitch_width + 1) #F(m, y), optimum tmbr_values
   index_info <- numeric(flitch_width) #from 1 to tmbr_widths[1]-1 elements are zero
@@ -66,15 +67,18 @@ cut_flitch <- function(flitch_width, tmbr_widths,
       }
     }
   }
-  
+
   #obtaining optimal solution
   x_opt <- numeric(m)
-  y_opt <- flitch_width+1
+  y_opt <- flitch_width
   
   while(index_info[y_opt] > 0) {
     idx <- index_info[y_opt]
     x_opt[idx] <- x_opt[idx] + 1
-    y_opt <- y_opt - tmbr_widths[idx]
+    y_opt <- (y_opt - tmbr_widths[idx])
+    if(y_opt == 0) { #viimeisellä iteraatiolla 0, rikkoo indeksöinnin
+      break
+    }
   }
   
   return(x_opt)
@@ -100,11 +104,21 @@ get_flitch_width <- function(r, a, b) {
 
 #funktio palauttaa puutavaran dynaamisen hinnan:
 #Annettuna:
-#alkuperäinen hinta; kysyntä puutavaralle; tuotettu määrä 
+  #alkuperäinen hinta; kysyntä puutavaralle; tuotettu määrä 
 create_dynamic_tmbr_prices <- function(orig_price, demand, prod) {
   return(max(0,orig_price*(1 - prod/demand)))
 }
 
+
+#funktio muodostaa plotin tuotteiden kysynnästä käytettyjen tukkien funktiona
+#Annettuna:
+  #data frame:
+    #rivit:     tukki-iteraatio nro i
+    #sarakkeet: tavaralajin j kysyntä iteraatiolla i
+visualize_demand <- function(demand_df) {
+  ggplot() +
+    ggtitle("Eri puutavaralajien kysyntä sahattujen tukkien funktiona")
+} 
 
 
 #funktio joka muodostaa plotin joka visualisoi tukin leikkauksen
@@ -120,6 +134,7 @@ visualize_log_cut <- function(log_diam, saw_points) {
 visualize_flitch_cut <- function(long_side, short_side, saw_points) {
   #geom_rect + geom_point
 }
+
 
 
 
