@@ -25,15 +25,16 @@
 # Generate new cost coefficients based on updated
 # orderbook
 #Pseudokoodi Todoroki & Rönnqvist
+library(here)
+source(here("src/functions.R"))
 
-source("functions.R")
-timber_thickness <- 5 #puutavaran paksuus. Nyt käsitellään vain yhtä paksuutta
-timber_widths <- c(2.5, 5, 10, 15) #eri leveydet. Vastaavat likimäärin yleisimpiä tuotteita
-log_r <- 20 #tukin säde senttimetreissä
+timber_thickness <- 50 #puutavaran paksuus. Nyt käsitellään vain yhtä paksuutta
+timber_widths <- c(25, 50, 100, 150) #eri leveydet. Vastaavat likimäärin yleisimpiä tuotteita
+log_r <- 200 #tukin säde senttimetreissä
 
 demand_A <- c() 
 demand_B <- c()
-demand_C <- c()
+
 
 #Mitä tarvitaan ulos?
 #Käytettyjen tukkien määrä
