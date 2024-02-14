@@ -109,6 +109,17 @@ create_dynamic_tmbr_prices <- function(orig_price, demand, prod) {
   return(max(0,orig_price*(1 - prod/demand)))
 }
 
+#apufunktio joka palauttaa indeksit tuotteista jotka EIVÄT ole annettua lankkua leveämpiä
+#Indekseillä muodostetaan uudet hinta- ja painovektorit
+#Annettuna:
+  #alkuperäinen puutavara-leveyslista;
+  #lankun leveys
+#Palauttaa:
+  #indeksit
+fit_width_idx <- function(tmbr_width_orig, flitch_width) {
+  return(which(tmbr_width_orig <= flitch_width))
+}
+
 
 #funktio muodostaa plotin tuotteiden kysynnästä käytettyjen tukkien funktiona
 #Annettuna:
