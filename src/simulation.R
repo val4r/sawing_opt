@@ -31,9 +31,11 @@ for (i in seq(N_iter)) {
     for(flitch in saw_points) {
       flitch_width <- get_flitch_width(r, flitch[1], flitch[2]) #lasketaan lankun lyhyemmän sivun leveys
       timber_idx <- fit_width_idx(timber_widths, flitch_width) #indeksit tuotteista joiden leveys ei ylitä särmätyn lankun leveyttä
+      full_prod <- full_prod_idx(prod, orderbook) #indeksit tuotteista joilla kysyntä täysi. Asetetaan niiden arvo nollaan seuraavassa if-elsesssä
 
       #käsitellään vain leveyksiä alle lankun leveyden
       #lisäksi asetetaan hinta c_i tapauskohtaisesti
+      #TODO: aseta nollaan täyden tuotannon tavarat
       timber_widths_new <- timber_widths[timber_idx]
       if(objective == 1) {
         price <- timber_prices[timber_idx]
