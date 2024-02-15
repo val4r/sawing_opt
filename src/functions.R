@@ -109,6 +109,13 @@ create_dynamic_tmbr_prices <- function(orig_price, demand, prod) {
   return(max(0,orig_price*(1 - prod/demand)))
 }
 
+#funktio palauttaa indeksit tuotteista joilla kysyntä täynnä
+#Annettuna: 
+  #tuotettu määrä (vektori); kysynnät (vektori);
+full_prod_idx <- function(prod, demand) {
+  return(which(prod >= demand))
+}
+
 #apufunktio joka palauttaa indeksit tuotteista jotka EIVÄT ole annettua lankkua leveämpiä
 #Indekseillä muodostetaan uudet hinta- ja painovektorit
 #Annettuna:
