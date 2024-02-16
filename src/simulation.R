@@ -5,18 +5,18 @@ source(here("src/functions.R"))
 N_iter <- 1;
 
 log_r_low <- 150
-log_r_high <- 300
+log_r_high <- 350
 
 timber_thickness <- 48; #puutavaran paksuus. Nyt käsitellään vain yhtä paksuutta
 timber_widths <- c(21, 48, 73, 125, 150); #eri leveydet. Vastaavat likimäärin yleisimpiä tuotteita
 m = length(timber_widths);
-timber_prices <- c(0.5, 1.25, 1.89, 3.25, 3.95); #puutavaran markkinahinnat
+timber_prices <- c(0.65, 1.25, 1.89, 3.25, 3.95); #puutavaran markkinahinnat
 assert_that(m == length(timber_prices))
 
-orderbook <- c(100, 100, 100, 100, 100); #puutavaroiden kysynnät
+orderbook <- c(500, 500, 500, 500, 500); #puutavaroiden kysynnät
 assert_that(length(orderbook) == m);
 
-objective <- 1; #mitä maksimoidaan (c_i): 1 = markkinahinta-tuotto, 2 = tuotetun tavaran tilavuutta, 3 = dynaaminen hinta-tuotto
+objective <- 2; #mitä maksimoidaan (c_i): 1 = markkinahinta-tuotto, 2 = tuotetun tavaran tilavuutta, 3 = dynaaminen hinta-tuotto
 
 for (i in seq(N_iter)) {
   prod <- numeric(length(orderbook)) #tuotettu puutavara kpl
@@ -27,20 +27,29 @@ for (i in seq(N_iter)) {
     r <- runif(1, log_r_low, log_r_high)
     saw_points <- get_flitch_saw_points(r, timber_thickness) #tukin läpisahauspisteet
     
+    
+    full_prod <- full_prod_idx(prod, orderbook) #indeksit tuotteista joilla kysyntä täysi
+    timber_prices_new <- timber_prices
+    timber_prices_new[full_prod] <- 0 #asetetaan kysynnän täyttäneiden tuotteiden hinnat nollaan
+    
+    width_cost_coeff <- timber_widths
+    width_cost_coeff[full_prod] <- 0 #asetetaan kysynnän täyttäneiden tuotteiden "leveyshinnat" nollaan, kts. objective 2
+    
     #loopataan seuraavaksi kaikki tukista syntyvät lankut ja luodaan niistä sahatavaraa:
     for(flitch in saw_points) {
       flitch_width <- get_flitch_width(r, flitch[1], flitch[2]) #lasketaan lankun lyhyemmän sivun leveys
+      
       timber_idx <- fit_width_idx(timber_widths, flitch_width) #indeksit tuotteista joiden leveys ei ylitä särmätyn lankun leveyttä
-      full_prod <- full_prod_idx(prod, orderbook) #indeksit tuotteista joilla kysyntä täysi. Asetetaan niiden arvo nollaan seuraavassa if-elsesssä
-
+      
       #käsitellään vain leveyksiä alle lankun leveyden
-      #lisäksi asetetaan hinta c_i tapauskohtaisesti
-      #TODO: aseta nollaan täyden tuotannon tavarat
       timber_widths_new <- timber_widths[timber_idx]
+      
+      #asetetaan hinta c_i tapauskohtaisesti
+      
       if(objective == 1) {
-        price <- timber_prices[timber_idx]
+        price <- timber_prices_new[timber_idx]
       } else if(objective == 2) {
-        price <- timber_widths[timber_idx] #c_i = w_i
+        price <- width_cost_coeff[timber_idx] #c_i = w_i
       } else if(objective == 3) {
         price <- dynamic_price[timber_idx]
       } else {
