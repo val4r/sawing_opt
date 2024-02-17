@@ -2,29 +2,39 @@ library(here)
 library("assertthat")
 source(here("src/functions.R"))
 
-N_iter <- 1;
-
-log_r_low <- 150
-log_r_high <- 350
-
+#VAKIOT
+N_iter <- 3;
+log_r_low <- 150;
+log_r_high <- 350;
 timber_thickness <- 48; #puutavaran paksuus. Nyt käsitellään vain yhtä paksuutta
 timber_widths <- c(21, 48, 73, 125, 150); #eri leveydet. Vastaavat likimäärin yleisimpiä tuotteita
 m = length(timber_widths);
 timber_prices <- c(0.65, 1.25, 1.89, 3.25, 3.95); #puutavaran markkinahinnat
 assert_that(m == length(timber_prices))
-
 orderbook <- c(500, 500, 500, 500, 500); #puutavaroiden kysynnät
 assert_that(length(orderbook) == m);
 
-objective <- 2; #mitä maksimoidaan (c_i): 1 = markkinahinta-tuotto, 2 = tuotetun tavaran tilavuutta, 3 = dynaaminen hinta-tuotto
+#TALLENNETTAVA DATA:
+n_log_all_iters <- numeric(N_iter) #eri simulaatioiteraatioiden käytetyt tukit, dimensio 1 x N_iter 
+r_all_iters <- c() #eri sim.iteraatioiden eri tukkien säteet, dimensio N_iter x N_log
+prod_all_iters <- c() #eri sim.iteraatioiden eri tukki-iteraatioiden tuotantomäärät, dimensio N_iter X N_log X m
+
+objective <- 3; #mitä maksimoidaan (c_i): 1 = markkinahinta-tuotto, 2 = tuotetun tavaran tilavuutta, 3 = dynaaminen hinta-tuotto
 
 for (i in seq(N_iter)) {
   prod <- numeric(length(orderbook)) #tuotettu puutavara kpl
+  prod_list <- list() #list of lists, jokaisen tukin kohdalla tuotettu tavara kpl
   dynamic_price <- mapply(create_dynamic_tmbr_prices, timber_prices, orderbook, prod) #lasketaan jokaiselle puutavaralla dynaaminen hinta
   N_log <- 0 #käytetyt tukit
+  r_list <- list()
   #otetaan uusia tukkeja niin kauan kunnes jokaisen puutavaraluokan kohdalla on tuotanto > kysyntä
+  k <- 1;
   while(sum(orderbook <= prod) < m) {
     r <- runif(1, log_r_low, log_r_high)
+    r_list <- append(r_list, r)
+    
+    prod_per_log <- prod #alustetaan edellisen iteraation tuotantomäärällä
+    
     saw_points <- get_flitch_saw_points(r, timber_thickness) #tukin läpisahauspisteet
     
     
@@ -59,7 +69,7 @@ for (i in seq(N_iter)) {
       #Seuraavaksi leikataan lankku puutavaraksi. 
       #cut_flitch-funktion algoritmi vaatii useampaa kuin yhtä tuotetta, siksi seuraava if-else:
       if(length(timber_idx) == 0) {
-        break
+        break #mikäli särmätty lankku on kapeampi kuin kapein tuote, ei synny tuotetta
       } else if(length(timber_idx) == 1) {
         prod[timber_idx[1]] <- prod[timber_idx[1]] + 1 #mikäli tuotteet on järjestetty kapeimmasta leveimpään, timber_idx[1] = 1
       } else {
@@ -75,19 +85,30 @@ for (i in seq(N_iter)) {
     #päivitetään dynamic_price & N_log
     N_log <- N_log + 1
     dynamic_price <- mapply(create_dynamic_tmbr_prices, timber_prices, orderbook, prod)
+    #tallennetaan tuotetut kappaleet
+    prod_per_log <- prod - prod_per_log #tuotanto tukilla i = kumulatiivinen tuotanto tukilla i - kumulatiivinen tuotanto tukilla (i-1)
+    prod_list[[k]] <- prod_per_log
+    k <- k + 1;
   }
+  #tallennetaan
+  n_log_all_iters[i] <- N_log
+  r_all_iters[[i]] <- r_list
+  prod_all_iters[[i]] <- prod_list
 }
 
+#mean(n_log_all_iters)
 
-
-#Mitä tarvitaan ulos?
+#Tallennetaan
+path1 <- paste0(here(), "/data/")
 #Käytettyjen tukkien määrä
+saveRDS(n_log_all_iters, paste0(path1,"n_log_all_iters_1.rds"))
+#Tukkien säde
+saveRDS(r_all_iters, paste0(path1, "r_all_iters_1.rds"))
 #Sahattujen tuotteiden määrä jokaisella tukki-iteraatiolla per tuote
-#Dynaamisessa hinnassa voisi ottaa ulos myös tuotteiden arvot per iteraatio
+saveRDS(prod_all_iters, paste0(path1, "prod_all_iters_1.rds"))
 
-#BONUS:
-#jokaisella iteraatiolla käytettyjen sahausten määrä
-#jokaisella iteraatiolla hyödynnetyn pinta-alan osuus
+
+
 
 
 
