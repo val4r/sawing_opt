@@ -128,6 +128,15 @@ fit_width_idx <- function(tmbr_width_orig, flitch_width) {
 }
 
 
+#funktio joka laskee tukin käyttöasteen
+#Annettuna:
+  #tukin säde r, tuotteen paksuus width, (lista) leveydet, (lista) lukumäärä per tuote
+calc_utilization <- function(r, thickness, widths, prod) {
+  log_area <- pi*r^2
+  prod_area <- (thickness * widths) %*% prod
+  return(prod_area / log_area)
+}
+
 #funktio muodostaa plotin tuotteiden kysynnästä käytettyjen tukkien funktiona
 #Annettuna:
   #data frame:
