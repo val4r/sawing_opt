@@ -137,12 +137,12 @@ calc_utilization <- function(r, thickness, widths, prod) {
   return(prod_area / log_area)
 }
 
-#funktio muodostaa plotin tuotteiden kysynnästä käytettyjen tukkien funktiona
+#funktio muodostaa plotin tuotteiden tuotannosta käytettyjen tukkien funktiona
 #Annettuna:
   #data frame:
     #rivit:     tukki-iteraatio nro i
     #sarakkeet: tavaralajin j kysyntä iteraatiolla i
-visualize_demand <- function(demand_df) {
+visualize_production <- function(prod_df) {
   ggplot() +
     ggtitle("Eri puutavaralajien kysyntä sahattujen tukkien funktiona")
 } 
