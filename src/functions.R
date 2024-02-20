@@ -134,8 +134,45 @@ fit_width_idx <- function(tmbr_width_orig, flitch_width) {
 calc_utilization <- function(r, thickness, widths, prod) {
   log_area <- pi*r^2
   prod_area <- (thickness * widths) %*% prod
-  return(prod_area / log_area)
+  return(as.numeric(prod_area / log_area))
 }
+
+#funktio joka laskee keskimääräisen tuotannon jokaisella tukki-iteraatiolla.
+#eli montako tuotetta i valmistettiin tukista j keskimäärin N:llä eri simulaatioiteraatiolla
+#Annettuna:
+  #tuotanto-list of lists joka tallennetaan simulation.R-tiedoston lopussa.
+  #listan elementteinä on eri simulaatioiteraatioiden tuotannot. 
+  #Nämä elementit itsessään ovat listoja vektoreista. 
+  #Vektorit sisältävät jokaisen tuotteen valmistusmäärät tukin j kohdalla.
+simulation_average_prod <- function(prod_list_of_lists) {
+  max_log <- max(sapply(prod_list_of_lists, length)) #eri simulaatioiteraatioiden maksimi tukkimäärä
+  
+  for (i in seq(length(prod_list_of_lists))) {
+    nam <- paste("prod_",i, sep = "")
+    assign(nam, prod_list_of_lists[[i]])
+    
+    nam_df <- paste("prod_df_",i, sep = "")
+    assign(nam_df, as.data.frame(do.call(rbind, get(nam))))
+    #muutetaan jokainen df sisältämään yhtä monta riviä
+    while(nrow(get(nam_df))<max_log) {
+      assign(nam_df, rbind(get(nam_df),0))
+    }
+    
+    #kumulatiiviset summat tukki-iteraatioiden yli
+    nam_cum_df <- paste("cumulative_prod", i, sep = "")
+    assign(nam_cum_df, as.data.frame(apply(get(nam_df), 2, cumsum)) %>% 
+             mutate(log_number = row_number()))
+  }
+  
+  #muodostetaan lista kaikista dataframeista
+  df_list <- mget(ls(pattern = "^cumulative_prod\\d+"))
+  #lasketaan jokaisen elementin keskiarvo dataframejen yli
+  mean_df <- as.data.frame(rbindlist(df_list)[,lapply(.SD,mean), list(log_number)])
+  
+  return(mean_df)
+}
+
+
 
 #funktio muodostaa plotin tuotteiden tuotannosta käytettyjen tukkien funktiona
 #Annettuna:
