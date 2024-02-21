@@ -3,7 +3,7 @@ library("assertthat")
 source(here("src/functions.R"))
 
 #VAKIOT
-N_iter <- 3;
+N_iter <- 200;
 log_r_low <- 150;
 log_r_high <- 350;
 timber_thickness <- 48; #puutavaran paksuus. Nyt käsitellään vain yhtä paksuutta
@@ -11,6 +11,7 @@ timber_widths <- c(21, 48, 73, 125, 150); #eri leveydet. Vastaavat likimäärin 
 m = length(timber_widths);
 timber_prices <- c(0.65, 1.25, 1.89, 3.25, 3.95); #puutavaran markkinahinnat
 assert_that(m == length(timber_prices))
+order <- "A" #datan tallentamisen nimeämistä varten
 orderbook <- c(500, 500, 500, 500, 500); #puutavaroiden kysynnät
 assert_that(length(orderbook) == m);
 
@@ -96,16 +97,26 @@ for (i in seq(N_iter)) {
   prod_all_iters[[i]] <- prod_list
 }
 
-#mean(n_log_all_iters)
+
 
 #Tallennetaan
 path1 <- paste0(here(), "/data/")
+
+#Mitä tiedostonimeen?
+#Tilauskirja (A/B)
+#opt obj: 1/2/3
+#iteraatioiden määrä N
+
+
 #Käytettyjen tukkien määrä
-saveRDS(n_log_all_iters, paste0(path1,"n_log_all_iters_1.rds"))
+n_log_file_name <- paste0("n_log_all_iters_", order, "_", objective, "_", N_iter, ".rds")
+saveRDS(n_log_all_iters, paste0(path1, n_log_file_name))
 #Tukkien säde
-saveRDS(r_all_iters, paste0(path1, "r_all_iters_1.rds"))
+r_all_file_name <- paste0("r_all_iters_", order, "_", objective, "_", N_iter, ".rds")
+saveRDS(r_all_iters, paste0(path1, r_all_file_name))
 #Sahattujen tuotteiden määrä jokaisella tukki-iteraatiolla per tuote
-saveRDS(prod_all_iters, paste0(path1, "prod_all_iters_1.rds"))
+prod_all_file_name <- paste0("prod_all_iters_", order, "_", objective, "_", N_iter, ".rds")
+saveRDS(prod_all_iters, paste0(path1, prod_all_file_name))
 
 
 
