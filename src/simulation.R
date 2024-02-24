@@ -3,16 +3,17 @@ library("assertthat")
 source(here("src/functions.R"))
 
 #VAKIOT
-N_iter <- 200;
+N_iter <- 1000;
 log_r_low <- 150;
-log_r_high <- 350;
+log_r_high <- 300;
 timber_thickness <- 48; #puutavaran paksuus. Nyt käsitellään vain yhtä paksuutta
 timber_widths <- c(21, 48, 73, 125, 150); #eri leveydet. Vastaavat likimäärin yleisimpiä tuotteita
 m = length(timber_widths);
 timber_prices <- c(0.65, 1.25, 1.89, 3.25, 3.95); #puutavaran markkinahinnat
 assert_that(m == length(timber_prices))
-order <- "A" #datan tallentamisen nimeämistä varten
-orderbook <- c(500, 500, 500, 500, 500); #puutavaroiden kysynnät
+order <- "B" #datan nimeämistä varten
+#orderbook <- c(500, 370, 320, 270, 225); #puutavaroiden kysynnät
+orderbook <- c(125, 270, 350, 410, 500) #B
 assert_that(length(orderbook) == m);
 
 #TALLENNETTAVA DATA:
