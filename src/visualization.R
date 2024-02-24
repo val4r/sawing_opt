@@ -9,17 +9,32 @@ source(here("src/functions.R"))
 
 path1 <- paste0(here(), "/data/")
 
-number_of_logs <- readRDS(paste0(path1, "n_log_all_iters_2.rds"))
+number_of_logs_obj_1_orderA <- readRDS(paste0(path1, "n_log_all_iters_A_1_200.rds"))
+number_of_logs_obj_2_orderA <- readRDS(paste0(path1, "n_log_all_iters_A_2_200.rds"))
+number_of_logs_obj_3_orderA <- readRDS(paste0(path1, "n_log_all_iters_A_3_200.rds"))
+# number_of_logs_obj_1_orderB <- readRDS(paste0(path1, "n_log_all_iters_B_1_200.rds"))
+# number_of_logs_obj_2_orderB <- readRDS(paste0(path1, "n_log_all_iters_B_2_200.rds"))
+# number_of_logs_obj_3_orderB <- readRDS(paste0(path1, "n_log_all_iters_B_3_200.rds"))
 
-radius <- readRDS(paste0(path1, "r_all_iters_2.rds"))
+radius_obj_1_orderA <- readRDS(paste0(path1, "r_all_iters_A_1_200.rds"))
+radius_obj_2_orderA <- readRDS(paste0(path1, "r_all_iters_A_2_200.rds"))
+radius_obj_3_orderA <- readRDS(paste0(path1, "r_all_iters_A_3_200.rds"))
+# radius_obj_1_orderB <- readRDS(paste0(path1, "r_all_iters_B_1_200.rds"))
+# radius_obj_2_orderB <- readRDS(paste0(path1, "r_all_iters_B_2_200.rds"))
+# radius_obj_3_orderB <- readRDS(paste0(path1, "r_all_iters_B_3_200.rds"))
 
-production <- readRDS(paste0(path1, "prod_all_iters_2.rds"))
+production_obj_1_orderA <- readRDS(paste0(path1, "prod_all_iters_A_1_200.rds"))
+production_obj_2_orderA <- readRDS(paste0(path1, "prod_all_iters_A_2_200.rds"))
+production_obj_3_orderA <- readRDS(paste0(path1, "prod_all_iters_A_3_200.rds"))
+# production_obj_1_orderB <- readRDS(paste0(path1, "prod_all_iters_B_1_200.rds"))
+# production_obj_2_orderB <- readRDS(paste0(path1, "prod_all_iters_B_2_200.rds"))
+# production_obj_3_orderB <- readRDS(paste0(path1, "prod_all_iters_B_3_200.rds"))
+
 
 #lasketaan keskiarvot simulaatioiteraatioiden yli
 
-#testikase
 
-mean_df <- simulation_average_prod(production)
+mean_df <- simulation_average_prod(production_obj_2_orderA)
 
 long_mean <- mean_df %>% 
   pivot_longer(V1:V5) 
@@ -34,24 +49,18 @@ ggplot(long_mean, aes(x = log_number, y = value, color = name)) +
   theme_minimal()
 
 #Käyttöasteista:
-
+#Tallennetaan jokaisen simulaatioiteraation jokaisen tukki-iteraation käyttöaste
+#Plotataan (r, käyttöaste)
 thick <- 48
 ws <- c(21, 48, 73, 125, 150)
-test_prod <- production[[1]][[50]]
-test_rad <- radius[[1]][[50]]
-calc_utilization(test_rad, thick, ws, test_prod) 
 
-ans <- numeric(length(production[[1]]))
+test <- calc_all_utils(thick, ws, production_obj_2_orderA, radius_obj_2_orderA)
 
-for (i in seq(length(production[[1]]))) {
-  test_prod <- production[[1]][[i]]
-  test_rad <- radius[[1]][[i]]
-  ans[i] <- calc_utilization(test_rad, thick, ws, test_prod) 
-}
-mean(ans)
-
+plot(test[[1]], test[[2]])
 
 #Käytettyjen tukkien jakauma:
+mean(number_of_logs_obj_1_orderA)
+mean(number_of_logs_obj_2_orderA)
+mean(number_of_logs_obj_3_orderA)
 
-
-hist(number_of_logs, breaks=10, main="Histogram of Data", xlab="Values", ylab="Frequency", col="lightblue", border="black")
+hist(number_of_logs_obj_1_orderA, breaks=10, main="Histogram of Data", xlab="Values", ylab="Frequency", col="lightblue", border="black")
