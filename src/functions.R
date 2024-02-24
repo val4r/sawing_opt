@@ -172,31 +172,28 @@ simulation_average_prod <- function(prod_list_of_lists) {
   return(mean_df)
 }
 
-
-
-#funktio muodostaa plotin tuotteiden tuotannosta käytettyjen tukkien funktiona
-#Annettuna:
-  #data frame:
-    #rivit:     tukki-iteraatio nro i
-    #sarakkeet: tavaralajin j kysyntä iteraatiolla i
-visualize_production <- function(prod_df) {
-  ggplot() +
-    ggtitle("Eri puutavaralajien kysyntä sahattujen tukkien funktiona")
-} 
-
-
-#funktio joka muodostaa plotin joka visualisoi tukin leikkauksen
-#Argumentit:
-  #tukin säde (numeric); läpisahausetäisyydet keskipisteestä (list of numerics)
-visualize_log_cut <- function(log_diam, saw_points) {
-  #geom_rect + geom_point
-}
-
-#funktio joka muodostaa plotin joka visualisoi tuppeensahatun lankun leikkauksen
-#Argumentit:
-  #lankun pitkä sivu (numeric); lankun lyhyt sivu (numeric), sahauspisteet (list of numerics)
-visualize_flitch_cut <- function(long_side, short_side, saw_points) {
-  #geom_rect + geom_point
+#funktio joka laskee käyttöasteet jokaiselle tukille jokaisessa simulaatio-
+#iteraatiossa. palauttaa ne yhtenä listana
+calc_all_utils <- function(thick, widths, prod_list, radius_list) {
+  N <- length(prod_list)
+  
+  util_all <- list()
+  r_all <- list()
+  
+  for (j in seq(N)) {
+    ans <- numeric(length(prod_list[[j]]))
+    for (i in seq(length(prod_list[[j]]))) {
+      prod <- prod_list[[j]][[i]]
+      rad <- radius_list[[j]][[i]]
+      ans[i] <- calc_utilization(rad, thick, widths, prod) 
+    }
+    r_all[[j]] <- radius_list[[j]]
+    util_all[[j]] <- ans
+  }
+  
+  util_all_flatten <- unlist(util_all)
+  r_all_flatten <- unlist(r_all)  
+  return(list(r_all_flatten, util_all_flatten))
 }
 
 
