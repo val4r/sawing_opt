@@ -179,6 +179,7 @@ calc_all_utils <- function(thick, widths, prod_list, radius_list) {
   
   util_all <- list()
   r_all <- list()
+  index_all <- numeric()
   
   for (j in seq(N)) {
     ans <- numeric(length(prod_list[[j]]))
@@ -189,11 +190,12 @@ calc_all_utils <- function(thick, widths, prod_list, radius_list) {
     }
     r_all[[j]] <- radius_list[[j]]
     util_all[[j]] <- ans
+    index_all <- append(index_all, seq(length(prod_list[[j]])))
   }
   
   util_all_flatten <- unlist(util_all)
   r_all_flatten <- unlist(r_all)  
-  return(list(r_all_flatten, util_all_flatten))
+  return(list(r_all_flatten, util_all_flatten, index_all))
 }
 
 
