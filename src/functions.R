@@ -198,6 +198,15 @@ calc_all_utils <- function(thick, widths, prod_list, radius_list) {
   return(list(r_all_flatten, util_all_flatten, index_all))
 }
 
+#funktio joka palauttaa yhdellä simulaatiokierroksella käytetyn raaka-aineen hinnan
+#Annettuna:
+  #tukin hinta per m^3
+  #sim. kierroksen aikana sahattujen tukkien säteet listana
+calc_costs <- function(log_price, radius_list) {
+  area_list <- mapply(function(x) (1e-06)*pi*x^2, radius_list)
+  total_cost <- sum(area_list*log_price)
+  return(total_cost)
+}
 
 
 
