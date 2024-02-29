@@ -64,7 +64,7 @@ ggplot(long_mean, aes(x = log_number, y = value)) +
 thick <- 48
 ws <- c(21, 48, 73, 125, 150)
 
-util_list <- calc_all_utils(thick, ws, production_obj_2_orderB, radius_obj_2_orderB)
+util_list <- calc_all_utils(thick, ws, production_obj_3_orderB, radius_obj_3_orderB)
 util_df <- as.data.frame(util_list) %>% 
   rename("r" = 1,
          "util_rate" = 2,
@@ -74,9 +74,9 @@ util_df <- as.data.frame(util_list) %>%
 sample_util_df <- util_df[sample(nrow(util_df), 3000), ]
   
 
-p_2_B <- ggplot(sample_util_df, aes(x=r, y=util_rate, color=idx)) + 
+p_3_B <- ggplot(sample_util_df, aes(x=r, y=util_rate, color=idx)) + 
           geom_point() + 
-          scale_color_gradient(low="red", high="green") +
+          scale_color_gradient(low="yellow", high="blue") +
           labs(
              x = "Tukin säde (mm)",
              y = "Tukin hyötyaste",
@@ -143,7 +143,7 @@ number_of_logs_df <- data.frame(number_of_logs_obj_1_orderA,
          "Tavoite 3, tilauskirja 1" = 3,
          "Tavoite 1, tilauskirja 2" = 4,
          "Tavoite 2, tilauskirja 2" = 5,
-         "Tavoite 3, tilauskirja 2" = 6,)
+         "Tavoite 3, tilauskirja 2" = 6)
 
 number_of_logs_df_long <- reshape2::melt(number_of_logs_df)
 
@@ -159,4 +159,49 @@ ggplot(number_of_logs_df_long, aes(x=value, fill=variable)) +
   scale_x_continuous(breaks = seq(30, 70, by = 2)) +
   theme(legend.title=element_blank())
 
+
+
+#Raaka-aineen hinta ja tilauskirjojen markkinahinnat
+log_price <- 72 #tukkipuun hinta per m3
+orderbook_A <- c(500, 370, 320, 270, 225)
+orderbook_B <- c(125, 270, 350, 410, 500)
+timber_prices <- c(0.65, 1.25, 1.89, 3.25, 3.95)
+
+profit_A <- as.numeric(orderbook_A %*% timber_prices)
+profit_B <- as.numeric(orderbook_B %*% timber_prices)
+
+costs_1_A <- mapply(calc_costs, log_price, radius_obj_1_orderA)
+costs_1_B <- mapply(calc_costs, log_price, radius_obj_1_orderB)
+
+costs_2_A <- mapply(calc_costs, log_price, radius_obj_2_orderA)
+costs_2_B <- mapply(calc_costs, log_price, radius_obj_2_orderB)
+
+costs_3_A <- mapply(calc_costs, log_price, radius_obj_3_orderA)
+costs_3_B <- mapply(calc_costs, log_price, radius_obj_3_orderB)
+
+costs_df <- data.frame(costs_1_A,
+                       costs_2_A,
+                       costs_3_A,
+                       costs_1_B,
+                       costs_2_B,
+                       costs_3_B) %>% 
+  rename("Tavoite 1, tilauskirja 1" = 1,
+         "Tavoite 2, tilauskirja 1" = 2,
+         "Tavoite 3, tilauskirja 1" = 3,
+         "Tavoite 1, tilauskirja 2" = 4,
+         "Tavoite 2, tilauskirja 2" = 5,
+         "Tavoite 3, tilauskirja 2" = 6)
+
+costs_df_long <- reshape2::melt(costs_df)
+
+cost_means <- colMeans(costs_df)
+sapply(costs_df, sd)
+
+ggplot(costs_df_long, aes(x=value, fill=variable)) +
+  geom_histogram(bins=20, alpha=0.5, position='identity') +
+  facet_wrap(~variable, scales='free') +
+  labs(x='Hinta (€)', y='Lukumäärä') +
+  geom_vline(aes(xintercept=cost_means[variable]), color='red', linetype='dashed', size=0.8) +
+  # scale_x_continuous(breaks = seq(30, 70, by = 2)) +
+  theme(legend.position="none")
 
